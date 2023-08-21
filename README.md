@@ -61,3 +61,4 @@ Here's what you need to do:
 ```
 All the required files to run `RoadscopePcbInspector.exe` will be placed in the directory you created.
 
+Note: `windeployqt6.exe` may not function propperly when output is built in Release mode. This appears to be a bug in the tool.
