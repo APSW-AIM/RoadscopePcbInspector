@@ -343,7 +343,7 @@ void MainWindow::updatePcbTestProgress()
 {
     const auto& pcbTestProgressBar = m_pMainWindowContents->m_pUi->pcbTestProgressBar;
     const auto progressIncrease = pcbTestProgressBar->maximum()
-                                  / (double) (kWriteTimeout / kProgressUpdateInterval);
+                                  / (double) (kPcbTestTimeout / kProgressUpdateInterval);
 
     m_pcbTestProgressValue += progressIncrease;
     pcbTestProgressBar->setValue((int) m_pcbTestProgressValue);
