@@ -36,7 +36,7 @@ It can help to inspect Roadscope9 PCBA by UART communication.
 
 * Switch to Proejcts mode (Ctrl+5)
 
-* Double-click "Desktop Qt 6.5.2 MinGW 64-bit" in the "Build & Run" list to activate it. When activaged, it will be displayed in bold font.
+* Double-click "Desktop Qt 6.5.2 MinGW 64-bit" in the "Build & Run" list to activate it. When activated, it will be displayed in bold font.
 
 * (Optional) You can select "Build-->Run CMake" from the menu bar.
   * However, this step is usually performed automatically.
