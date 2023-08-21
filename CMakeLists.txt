@@ -21,7 +21,7 @@ set(PROJECT_SOURCES
         main.cpp
         mainwindow.cpp mainwindow.h mainwindow.ui
         mainwindowcontents.cpp mainwindowcontents.h mainwindowcontents.ui
-        CustomStringListModel.h
+        customstringlistmodel.h
         contentwidget.cpp contentwidget.h
         horizontalbarwidget.cpp horizontalbarwidget.h
         statitem.h statitem.cpp
@@ -36,6 +36,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
         resources.qrc
+        customstringlistmodel.cpp
     )
 
     qt_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})

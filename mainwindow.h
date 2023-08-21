@@ -9,7 +9,7 @@
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QPushButton>
 
-#include "CustomStringListModel.h"
+#include "customstringlistmodel.h"
 
 QT_BEGIN_NAMESPACE
 
