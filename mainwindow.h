@@ -16,6 +16,7 @@ QT_BEGIN_NAMESPACE
 class QLabel;
 class QTimer;
 
+
 namespace Ui
 {
 class MainWindow;
@@ -85,6 +86,9 @@ private:
 
     void sendPcbTestSerialTx();
 
+    void saveHistoryToFile(QStringListModel& listModel);
+    void loadHistoryFromFile(QStringListModel& listModel);
+
 private:
     Ui::MainWindow* m_pMainWindow = nullptr;
     MainWindowContents* m_pMainWindowContents = nullptr;
@@ -110,6 +114,7 @@ private:
     PcbTestResult m_pcbTestResult = PcbTestResult::None;
 
     bool m_testInProgress = false;
+    bool m_testHasReponse = false;
     bool m_testSerialConnected = false;
 
     CustomStringListModel m_pcbTestHistoryListModel;

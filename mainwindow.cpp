@@ -15,7 +15,9 @@
 #include "statitem.h"
 
 #include <QDateTime>
+#include <QFile>
 #include <QTimer>
+#include <QStringListModel>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMessageBox>
 
@@ -23,6 +25,10 @@ static constexpr std::chrono::milliseconds kPcbTestTimeout = std::chrono::millis
 static constexpr std::chrono::milliseconds kWriteTimeout = std::chrono::milliseconds{25000};
 static constexpr std::chrono::milliseconds kSerialTxRetryInterval = std::chrono::milliseconds{1000};
 static constexpr std::chrono::milliseconds kProgressUpdateInterval = std::chrono::milliseconds{100};
+
+
+static constexpr const char* kTestHistoryFileName = "history.dat";
+
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -69,6 +75,8 @@ MainWindow::MainWindow(QWidget* parent)
     connect(m_pUiUpdateTimer, &QTimer::timeout, this, &MainWindow::updatePcbTestProgress);
     connect(m_pSerialPort, &QSerialPort::readyRead, this, &MainWindow::readData);
     connect(m_pSerialPort, &QSerialPort::bytesWritten, this, &MainWindow::handleBytesWritten);
+
+    loadHistoryFromFile(m_pcbTestHistoryListModel);
 
     *m_pStatItem = StatItem::readFromFile();
     m_pPcbTestStatsWidget->SetData(m_pStatItem);
@@ -235,6 +243,8 @@ void MainWindow::readData()
             {
                 //
             }
+
+            m_testHasReponse = true;
         }
         else
         {
@@ -315,7 +325,14 @@ void MainWindow::handlePcbTestTimeout()
 
     if (m_testInProgress == true)
     {
-        finishPcbTest(PcbTestResult::Failed_NoResponse);
+        if (m_testHasReponse == true)
+        {
+            finishPcbTest(PcbTestResult::Failed_WrongRx);
+        }
+        else
+        {
+            finishPcbTest(PcbTestResult::Failed_NoResponse);
+        }
     }
     else if (m_testSerialConnected == false)
     {
@@ -366,6 +383,7 @@ void MainWindow::beginPcbTest()
 
     m_testInProgress = true;
     m_testSerialConnected = false;
+    m_testHasReponse = false;
     m_pcbTestResult = PcbTestResult::None;
 
     const auto& pcbTestResultLabel = m_pMainWindowContents->m_pUi->pcbTestResultLabel;
@@ -401,6 +419,10 @@ void MainWindow::clearStatisticsData()
         m_pStatItem->clear();
         m_pStatItem->writeStatItemToFile();
         m_pPcbTestStatsWidget->SetData(m_pStatItem);
+
+        m_pcbTestHistoryListModel.setStringList(QStringList());
+        saveHistoryToFile(m_pcbTestHistoryListModel);
+        m_pcbTestCount = 0;
     }
 }
 
@@ -415,7 +437,7 @@ void MainWindow::about()
                                 .arg(__TIMESTAMP__));
 
     aboutMessageBox.addButton("OK", QMessageBox::YesRole);
-    aboutMessageBox.setStyleSheet("QLabel { min-width: 180px; text-align: left; }");
+    aboutMessageBox.setStyleSheet("QLabel { min-width: 240px; text-align: left; }");
 
     aboutMessageBox.exec();
 }
@@ -499,12 +521,15 @@ void MainWindow::checkPcbTestFinished()
         const QDateTime currentDateTime = QDateTime::currentDateTime();
 
         m_pcbTestHistoryListModel.appendItem(
-            tr("[%1 (%2)] TEST %3: %4 in %5ms")
+            tr("[%1 (%2)] TEST %3: %4 in %5ms (%6)")
                 .arg(currentDateTime.toString("yyyy-MM-dd hh:mm:ss"),
                      currentDateTime.timeZoneAbbreviation(),
                      QString::number(m_pcbTestCount),
                      QMetaEnum::fromType<PcbTestResult>().valueToKey(m_pcbTestResult),
-                     QString::number(m_pcbTestElapsedTimer.elapsed())));
+                     QString::number(m_pcbTestElapsedTimer.elapsed()),
+                     m_pSerialPort->portName()));
+
+        saveHistoryToFile(m_pcbTestHistoryListModel);
 
         m_pMainWindowContents->m_pUi->pcbTestHistoryListView->scrollToBottom();
     }
@@ -524,4 +549,42 @@ void MainWindow::sendPcbTestSerialTx()
 {
     writeData("\r\n");
     //writeData("show ptb\n");
+}
+
+void MainWindow::saveHistoryToFile(QStringListModel& listModel)
+{
+    QFile file(kTestHistoryFileName);
+
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        QStringList dataList = listModel.stringList();
+        QTextStream stream(&file);
+        for (const QString& item : dataList)
+        {
+            stream << item << Qt::endl;
+        }
+        file.close();
+    }
+}
+
+void MainWindow::loadHistoryFromFile(QStringListModel& listModel)
+{
+    QFile file(kTestHistoryFileName);
+
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        QStringList dataList;
+        QTextStream stream(&file);
+        while (!stream.atEnd())
+        {
+            QString str = stream.readLine();
+            dataList.append(str);
+        }
+        file.close();
+        listModel.setStringList(dataList);
+
+        m_pcbTestCount = dataList.count();
+    }
+
+    m_pMainWindowContents->m_pUi->pcbTestHistoryListView->scrollToBottom();
 }
