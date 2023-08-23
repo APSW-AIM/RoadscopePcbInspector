@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 
+#include <QScreen>
 #include <QIcon>
 #include <QLocale>
 #include <QTranslator>
@@ -23,6 +24,14 @@ int main(int argc, char* argv[])
         }
     }
     MainWindow window;
+
+    // Calculate the geometry for the centered window
+    QScreen *primaryScreen = QGuiApplication::primaryScreen();
+    QRect mainScreenGeometry = primaryScreen->geometry();
+    int x = (mainScreenGeometry.width() - window.width()) / 2;
+    int y = (mainScreenGeometry.height() - window.height()) / 2;
+    window.move(x, y);
+
     window.show();
     return app.exec();
 }
