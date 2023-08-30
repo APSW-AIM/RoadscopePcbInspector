@@ -1,9 +1,9 @@
 #include "statitem.h"
 
-#include <QCoreApplication>
-#include <QDataStream>
-#include <QDebug>
-#include <QFile>
+#include <QtCore/QCoreApplication>
+#include <QtCore/QDataStream>
+#include <QtCore/QDebug>
+#include <QtCore/QFile>
 
 StatItem::StatItem()
     : count_total(0)

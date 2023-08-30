@@ -27,6 +27,13 @@ class SettingsDialog : public QDialog
     Q_OBJECT
 
 public:
+    enum ProductType
+    {
+        Roadscope9,
+        PI5009
+    };
+
+public:
     struct Settings
     {
         QString name;
@@ -40,6 +47,7 @@ public:
         QString stringStopBits;
         QSerialPort::FlowControl flowControl;
         QString stringFlowControl;
+        ProductType productType;
         bool localEchoEnabled;
     };
 
@@ -60,6 +68,7 @@ private slots:
 private:
     void fillPortsParameters();
     void fillPortsInfo();
+    void fillProductList();
     void updateSettings();
 
 private:

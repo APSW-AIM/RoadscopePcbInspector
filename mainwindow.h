@@ -1,21 +1,23 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QElapsedTimer>
-#include <QMetaEnum>
-#include <QString>
+#include <QtCore/QString>
 #include <QtGui/QStandardItemModel>
 #include <QtSerialPort/QSerialPort>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QPushButton>
+#include <QtCore/QMetaObject>
 
-#include "customstringlistmodel.h"
+
+#include "settingsdialog.h"
+#include "SerialState.h"
+
 
 QT_BEGIN_NAMESPACE
 
 class QLabel;
 class QTimer;
-
+class QStackedWidget;
 
 namespace Ui
 {
@@ -24,11 +26,9 @@ class MainWindow;
 
 QT_END_NAMESPACE
 
-class MainWindowContents;
-class Console;
-class SettingsDialog;
-class HorizontalBarWidget;
-class StatItem;
+class R9PcbTesterWidget;
+class Pi5009TestWidget;
+
 
 class MainWindow : public QMainWindow
 {
@@ -38,17 +38,6 @@ public:
     MainWindow(QWidget* parent = nullptr);
     ~MainWindow();
 
-public:
-    enum PcbTestResult
-    {
-        None = 0,
-        Passed,
-        Failed_NoResponse,
-        Failed_WrongRx,
-        Failed_TxError,
-        NotTested
-    };
-    Q_ENUM(PcbTestResult)
 
 private:
     void initActionsConnections();
@@ -56,52 +45,40 @@ private:
 private slots:
     void openSerialPort();
     void closeSerialPort();
-    void writeData(const QByteArray& data);
     void readData();
-
     void handleError(QSerialPort::SerialPortError error);
-    void handleSerialTxRetry();
-    void handlePcbTestTimeout();
     void handleBytesWritten(qint64 bytes);
     void handleWriteTimeout();
 
-    void updatePcbTestProgress();
-
-    void beginPcbTest();
-
-    void clearStatisticsData();
+    void writeSerialData(const QByteArray& data);
+    void writeSerialDataDone();
 
     void about();
 
 private:
-    void setPcbTestEnabled(bool);
-
-    void finishPcbTest(const PcbTestResult& result);
-
-    void checkPcbTestFinished();
-    void handlePcbTestDone(const PcbTestResult& result);
-
+    void changeProductType(SettingsDialog::ProductType productType);
     void showStatusMessage(const QString& message);
-    void showWriteError(const QString& message);
 
-    void sendPcbTestSerialTx();
 
-    void saveHistoryToFile(QStringListModel& listModel);
-    void loadHistoryFromFile(QStringListModel& listModel);
+Q_SIGNALS:
+    void serialRxComplete(const QString& str);
+    void serialStateChanged(const QString& portName, SerialState serialState, const QString& extra="");
+    void putConsole(const QByteArray& data);
+
 
 private:
     Ui::MainWindow* m_pMainWindow = nullptr;
-    MainWindowContents* m_pMainWindowContents = nullptr;
-    Console* m_pConsole = nullptr;
+    QStackedWidget* m_pMainWindowContentsStack = nullptr;
+    R9PcbTesterWidget* m_pR9PcbTesterWidget = nullptr;
+    Pi5009TestWidget* m_pPi5009TestWidget = nullptr;
+
     QLabel* m_pStatusLabel = nullptr;
     QLabel* m_pTestResultLabel = nullptr;
 
     SettingsDialog* m_pSettingsDialog = nullptr;
-    QTimer* m_pPcbTestTimer = nullptr;
-    QTimer* m_pSerialResponseTimer = nullptr;
-    QTimer* m_pSerialTxRetryTimer = nullptr;
-    QTimer* m_pUiUpdateTimer = nullptr;
+    SettingsDialog::Settings mCurrentSettings;
 
+    QTimer* m_pSerialResponseTimer = nullptr;
     QSerialPort* m_pSerialPort = nullptr;
 
     QPushButton* m_pTestButton = nullptr;
@@ -109,19 +86,12 @@ private:
     qint64 m_bytesToWrite = 0;
     QByteArray m_readBuffer;
 
-    qint64 m_pcbTestCount = 0;
-    double m_pcbTestProgressValue = 0;
-    PcbTestResult m_pcbTestResult = PcbTestResult::None;
+    QMetaObject::Connection m_serialStateChangedConnection;
+    QMetaObject::Connection m_serialRxCompleteConnection;
+    QMetaObject::Connection m_clearStatConnection;
+    QMetaObject::Connection m_writeSerialDataConnection;
+    QMetaObject::Connection m_writeSerialDataDoneConnection;
+    QMetaObject::Connection m_putConsoleConnection;
 
-    bool m_testInProgress = false;
-    bool m_testHasReponse = false;
-    bool m_testSerialConnected = false;
-
-    CustomStringListModel m_pcbTestHistoryListModel;
-    QElapsedTimer m_pcbTestElapsedTimer;
-
-    HorizontalBarWidget* m_pPcbTestStatsWidget;
-
-    StatItem* m_pStatItem;
 };
 #endif // MAINWINDOW_H

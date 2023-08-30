@@ -5,7 +5,6 @@
 #ifndef CONSOLE_H
 #define CONSOLE_H
 
-// #include <QPlainTextEdit>
 #include <QtWidgets/QPlainTextEdit>
 
 class Console : public QPlainTextEdit

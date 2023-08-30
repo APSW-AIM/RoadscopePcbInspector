@@ -1,10 +1,14 @@
 #include "mainwindow.h"
 
-#include <QScreen>
-#include <QIcon>
-#include <QLocale>
-#include <QTranslator>
+#include <QtGui/QScreen>
+#include <QtGui/QIcon>
+#include <QtCore/QLocale>
+#include <QtCore/QTranslator>
 #include <QtWidgets/QApplication>
+#include <QtCore/qtmetamacros.h>
+
+#include "config.h"
+
 
 int main(int argc, char* argv[])
 {
@@ -16,7 +20,7 @@ int main(int argc, char* argv[])
     const QStringList uiLanguages = QLocale::system().uiLanguages();
     for (const QString& locale : uiLanguages)
     {
-        const QString baseName = "RoadscopePcbInspector_" + QLocale(locale).name();
+        const QString baseName = PROJECT_NAME_STR"_" + QLocale(locale).name();
         if (translator.load(":/i18n/" + baseName))
         {
             app.installTranslator(&translator);
@@ -31,6 +35,8 @@ int main(int argc, char* argv[])
     int x = (mainScreenGeometry.width() - window.width()) / 2;
     int y = (mainScreenGeometry.height() - window.height()) / 2;
     window.move(x, y);
+
+    window.setWindowTitle(PROJECT_NAME_STR " " PROJECT_VERSION_STR " Build " __DATE__ " " __TIME__);
 
     window.show();
     return app.exec();

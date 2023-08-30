@@ -1,7 +1,7 @@
 #ifndef CUSTOMSTRINGLISTMODEL_H
 #define CUSTOMSTRINGLISTMODEL_H
 
-#include <QStringListModel>
+#include <QtCore/QStringListModel>
 
 class CustomStringListModel : public QStringListModel
 {

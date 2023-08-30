@@ -36,6 +36,7 @@ SettingsDialog::SettingsDialog(QWidget* parent)
 
     fillPortsParameters();
     fillPortsInfo();
+    fillProductList();
 
     updateSettings();
 }
@@ -167,6 +168,15 @@ void SettingsDialog::fillPortsInfo()
     m_ui->serialPortInfoListBox->setCurrentIndex(selectedPortIndex);
 }
 
+void SettingsDialog::fillProductList()
+{
+    m_ui->productComboBox->clear();
+    m_ui->productComboBox->addItem(QStringLiteral("Roadscope9"), ProductType::Roadscope9);
+    m_ui->productComboBox->addItem(QStringLiteral("PI5009"), ProductType::PI5009);
+
+    m_ui->productComboBox->setCurrentIndex(0);
+}
+
 void SettingsDialog::updateSettings()
 {
     m_currentSettings.name = m_ui->serialPortInfoListBox->currentText();
@@ -199,4 +209,6 @@ void SettingsDialog::updateSettings()
     m_currentSettings.stringFlowControl = m_ui->flowControlBox->currentText();
 
     m_currentSettings.localEchoEnabled = m_ui->localEchoCheckBox->isChecked();
+
+    m_currentSettings.productType = m_ui->productComboBox->currentData().value<ProductType>();
 }

@@ -1,8 +1,8 @@
 #ifndef STATITEM_H
 #define STATITEM_H
 
-#include <QDataStream>
-#include <QString>
+#include <QtCore/QDataStream>
+#include <QtCore/QString>
 
 #define STAT_ITEM_DEFAULT_FILE_NAME "statitem.dat"
 

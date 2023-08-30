@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindowContents</class>
- <widget class="QWidget" name="MainWindowContents">
+ <class>R9PcbTesterWidget</class>
+ <widget class="QWidget" name="R9PcbTesterWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
