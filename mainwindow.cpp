@@ -183,28 +183,34 @@ void MainWindow::writeSerialDataDone()
 
 void MainWindow::readData()
 {
+    const QByteArray crPattern = "\r\n";
     const QByteArray data = m_pSerialPort->readAll();
-
-    emit putConsole(data);
-    //m_pR9PcbTesterWidget->m_pConsole->putData(data);
 
     m_readBuffer += data;
 
-    const QByteArray crPattern = "\r\n";
-    const int crIndex = m_readBuffer.indexOf("\r\n");
-    if (crIndex != -1)
+    int crIndex = m_readBuffer.indexOf(crPattern);
+    int nCompleteCount = 0;
+    while (crIndex != -1)
     {
-        QByteArray completeStringBytes = m_readBuffer.left(crIndex);
-        QString completeString = QString::fromUtf8(completeStringBytes);
-        qInfo() << "Read: " << completeString;
+        nCompleteCount++;
+        const QByteArray completeStringBytes = m_readBuffer.left(crIndex);
+        const QString completeString = QString::fromUtf8(completeStringBytes);
+        const QString debugOutput = tr("Read(%1): ").arg(nCompleteCount) + completeString + "\n";
+        qInfo() << debugOutput;
+
+        emit putConsole(debugOutput.toUtf8());
 
         emit serialRxComplete(completeString);
 
         m_readBuffer.remove(0, crIndex + crPattern.size());
+
+        crIndex = m_readBuffer.indexOf(crPattern);
     }
-    else
+
+    if (m_readBuffer.length() > 1024)
     {
-        qInfo() << "Read (X): " << data;
+        emit putConsole("Error! readBuffer is too long");
+        m_readBuffer.clear();
     }
 }
 
