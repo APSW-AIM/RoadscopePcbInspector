@@ -159,6 +159,8 @@ void MainWindow::writeSerialData(const QByteArray& data)
 
     if (written == data.size())
     {
+        qInfo() << "written=" << written << ", data.size()=" << data.size() << ", data=" << data << " [OK]";
+
         m_bytesToWrite += written;
         m_pSerialResponseTimer->start(kWriteTimeout);
     }
@@ -346,6 +348,10 @@ void MainWindow::changeProductType(SettingsDialog::ProductType productType)
 
 
         m_pMainWindowContentsStack->setCurrentWidget(m_pPi5009TestWidget);
+
+        m_putConsoleConnection = connect(this, &MainWindow::putConsole,
+                                         m_pPi5009TestWidget, &Pi5009TestWidget::onPutConsole);
+
         break;
 
     default:

@@ -162,14 +162,16 @@ void R9PcbTesterWidget::checkPcbTestFinished()
         pcbTestResultLabel->setText("FAILED");
         break;
 
-    case PcbTestResult::Failed_WrongRx:
+    case PcbTestResult::Failed_WrongRx_R9:
+    case PcbTestResult::Failed_WrongRx_R8:
         testDone = true;
         m_pStatItem->count_failed_wrongRx++;
         pcbTestResultLabel->setStyleSheet("QLabel { background : red; }");
         pcbTestResultLabel->setText("FAILED");
         break;
 
-    case PcbTestResult::Passed:
+    case PcbTestResult::Passed_R9:
+    case PcbTestResult::Passed_R8:
         testDone = true;
         m_pStatItem->count_passed++;
         pcbTestResultLabel->setStyleSheet("QLabel { background : green; }");
@@ -261,11 +263,15 @@ void R9PcbTesterWidget::onSerialRxCompleteString(const QString& completeString)
 
         if (completeString.contains("amboot>"))
         {
-            finishPcbTest(PcbTestResult::Failed_WrongRx);
+            finishPcbTest(PcbTestResult::Failed_WrongRx_R9);
         }
         else if (completeString.contains("a:\\>"))
         {
-            finishPcbTest(PcbTestResult::Passed);
+            finishPcbTest(PcbTestResult::Passed_R9);
+        }
+        else if (completeString.contains("NVS3320#"))
+        {
+            finishPcbTest(PcbTestResult::Passed_R8);
         }
         else
         {
@@ -384,7 +390,7 @@ void R9PcbTesterWidget::handlePcbTestTimeout()
     {
         if (m_testHasReponse == true)
         {
-            finishPcbTest(PcbTestResult::Failed_WrongRx);
+            finishPcbTest(PcbTestResult::Failed_WrongRx_Unknown);
         }
         else
         {

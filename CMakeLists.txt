@@ -33,6 +33,7 @@ set(PROJECT_SOURCES
         customstringlistmodel.cpp
         Pi5009TestWidget.h Pi5009TestWidget.cpp Pi5009TestWidget.ui
         SerialState.h
+        RenderArea.h RenderArea.cpp
         ${TS_FILES}
 )
 
@@ -43,6 +44,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ${PROJECT_SOURCES}
         resources.qrc
         config.h.in
+
     )
 
     qt_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})

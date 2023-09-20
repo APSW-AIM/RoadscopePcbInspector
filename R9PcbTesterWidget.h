@@ -2,7 +2,7 @@
 #define R9PCBTESTERWIDGET_H
 
 #include <QtWidgets/QWidget>
-#include <QElapsedTimer>
+#include <QtCore/QElapsedTimer>
 
 #include "ui_R9PcbTesterWidget.h"
 
@@ -34,9 +34,12 @@ public:
     enum PcbTestResult
     {
         None = 0,
-        Passed,
+        Passed_R9,
+        Passed_R8,
         Failed_NoResponse,
-        Failed_WrongRx,
+        Failed_WrongRx_R9,
+        Failed_WrongRx_R8,
+        Failed_WrongRx_Unknown,
         Failed_TxError,
         NotTested
     };

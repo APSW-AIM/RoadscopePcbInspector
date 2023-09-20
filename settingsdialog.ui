@@ -160,7 +160,7 @@
       <item row="0" column="0">
        <widget class="QComboBox" name="productComboBox">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
       </item>
